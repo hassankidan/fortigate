@@ -1,13 +1,12 @@
 ---
 - name: Add Facebook IP Blocks and Group
   hosts: forti
-  gather_facts: no  # Add this line to skip the fact gathering step
+  gather_facts: no
   tasks:
   
     # Creating Individual IP addresses
     - name: Create IP Address Facebook_{{ index }}"
       fortinet.fortios.fortios_firewall_address:
-        access_token: "{{ access_token }}"
         state: "present"
         address:
           name: "Facebook_{{ index }}"
@@ -29,7 +28,6 @@
     # Creating IP Ranges
     - name: Create IP Range Facebook_{{ index + 8 }}" # Start at 9 since there are 8 individual IPs
       fortinet.fortios.fortios_firewall_address:
-        access_token: "{{ access_token }}"
         state: "present"
         address:
           name: "Facebook_{{ index + 8 }}"
@@ -47,7 +45,6 @@
     # Creating IP Blocks
     - name: Create IP Block Facebook_{{ index + 11 }}" # Start at 12 since there are 8 IPs and 3 IP ranges
       fortinet.fortios.fortios_firewall_address:
-        access_token: "{{ access_token }}"
         state: "present"
         address:
           name: "Facebook_{{ index + 11 }}"
@@ -65,7 +62,6 @@
     # Creating Address Group and adding IPs
     - name: Create Address Group Facebook_group and Add IPs
       fortinet.fortios.fortios_firewall_addrgrp:
-        access_token: "{{ access_token }}"
         state: "present"
         addrgrp:
           name: "Facebook_group"
