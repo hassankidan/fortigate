@@ -1,6 +1,7 @@
 ---
 - name: Add Facebook IP Blocks and Group
   hosts: forti
+  gather_facts: no  # Add this line to skip the fact gathering step
   tasks:
   
     # Creating Individual IP addresses
