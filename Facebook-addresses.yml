@@ -2,6 +2,10 @@
 - name: Add Facebook IP Blocks and Group
   hosts: forti
   gather_facts: no
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    
   tasks:
   
     # Creating Individual IP addresses
