@@ -1,0 +1,71 @@
+---
+- name: Add Facebook IP Blocks and Group
+  hosts: forti
+  tasks:
+  
+    # Creating Individual IP addresses
+    - name: Create IP Address Facebook_{{ index }}"
+      fortinet.fortios.fortios_firewall_address:
+        access_token: "{{ access_token }}"
+        state: "present"
+        address:
+          name: "Facebook_{{ index }}"
+          type: "ipmask"
+          subnet: "{{ item }} 255.255.255.255"
+      register: ip_blocks
+      loop:
+        - "69.63.176.13"
+        - "69.63.181.15"
+        - "69.63.184.142"
+        - "69.63.187.17"
+        - "69.63.187.18"
+        - "69.63.187.19"
+        - "69.63.181.11"
+        - "69.63.181.12"
+      loop_control:
+        index_var: index
+  
+    # Creating IP Ranges
+    - name: Create IP Range Facebook_{{ index + 8 }}" # Start at 9 since there are 8 individual IPs
+      fortinet.fortios.fortios_firewall_address:
+        access_token: "{{ access_token }}"
+        state: "present"
+        address:
+          name: "Facebook_{{ index + 8 }}"
+          type: "iprange"
+          start_ip: "{{ item.split(' – ')[0] }}"
+          end_ip: "{{ item.split(' – ')[1] }}"
+      register: ip_ranges
+      loop:
+        - "66.220.144.0 – 66.220.159.255"
+        - "69.63.176.0 – 69.63.191.255"
+        - "204.15.20.0 – 204.15.23.255"
+      loop_control:
+        index_var: index
+  
+    # Creating IP Blocks
+    - name: Create IP Block Facebook_{{ index + 11 }}" # Start at 12 since there are 8 IPs and 3 IP ranges
+      fortinet.fortios.fortios_firewall_address:
+        access_token: "{{ access_token }}"
+        state: "present"
+        address:
+          name: "Facebook_{{ index + 11 }}"
+          type: "ipmask"
+          subnet: "{{ item }}"
+      register: ip_blocks
+      loop:
+        # Add your CIDR blocks here...
+        - "31.13.24.0/21"
+        - "31.13.64.0/19"
+        # ... truncated for brevity
+      loop_control:
+        index_var: index
+  
+    # Creating Address Group and adding IPs
+    - name: Create Address Group Facebook_group and Add IPs
+      fortinet.fortios.fortios_firewall_addrgrp:
+        access_token: "{{ access_token }}"
+        state: "present"
+        addrgrp:
+          name: "Facebook_group"
+          member: "{{ ip_blocks.results + ip_ranges.results | map(attribute='address.name') | list }}"
