@@ -4,14 +4,19 @@
   gather_facts: no
 
   vars:
-   ansible_python_interpreter: /usr/bin/python3
-   ansible_ssh_transfer_method: piped    
-   
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_transfer_method: piped    
+
   tasks:
   
     # Creating Individual IP addresses
     - name: Create IP Address Facebook_{{ index }}"
       fortinet.fortios.fortios_firewall_address:
+        login:
+          host: '{{ ansible_host }}'
+          username: 'api-user'
+          password: "{{ lookup('env', 'FORTINET_API_KEY') }}"
+          vdom: 'root'
         state: "present"
         address:
           name: "Facebook_{{ index }}"
@@ -31,8 +36,13 @@
         index_var: index
   
     # Creating IP Ranges
-    - name: Create IP Range Facebook_{{ index + 8 }}" # Start at 9 since there are 8 individual IPs
+    - name: Create IP Range Facebook_{{ index + 8 }}"
       fortinet.fortios.fortios_firewall_address:
+        login:
+          host: '{{ ansible_host }}'
+          username: 'api-user'
+          password: "{{ lookup('env', 'FORTINET_API_KEY') }}"
+          vdom: 'root'
         state: "present"
         address:
           name: "Facebook_{{ index + 8 }}"
@@ -48,8 +58,13 @@
         index_var: index
   
     # Creating IP Blocks
-    - name: Create IP Block Facebook_{{ index + 11 }}" # Start at 12 since there are 8 IPs and 3 IP ranges
+    - name: Create IP Block Facebook_{{ index + 11 }}"
       fortinet.fortios.fortios_firewall_address:
+        login:
+          host: '{{ ansible_host }}'
+          username: 'api-user'
+          password: "{{ lookup('env', 'FORTINET_API_KEY') }}"
+          vdom: 'root'
         state: "present"
         address:
           name: "Facebook_{{ index + 11 }}"
@@ -57,16 +72,19 @@
           subnet: "{{ item }}"
       register: ip_blocks
       loop:
-        # Add your CIDR blocks here...
         - "31.13.24.0/21"
         - "31.13.64.0/19"
-        # ... truncated for brevity
       loop_control:
         index_var: index
   
     # Creating Address Group and adding IPs
     - name: Create Address Group Facebook_group and Add IPs
       fortinet.fortios.fortios_firewall_addrgrp:
+        login:
+          host: '{{ ansible_host }}'
+          username: 'api-user'
+          password: "{{ lookup('env', 'FORTINET_API_KEY') }}"
+          vdom: 'root'
         state: "present"
         addrgrp:
           name: "Facebook_group"
