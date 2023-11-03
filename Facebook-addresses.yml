@@ -1,6 +1,6 @@
 ---
 - name: Add Facebook IP Blocks and Group
-  hosts: forti
+  hosts: fortigates
   gather_facts: no
 
   vars:
