@@ -1,0 +1,13 @@
+---
+- name: Check SSH Connectivity to FortiGates
+  hosts: fortigates
+  gather_facts: no
+
+  tasks:
+    - name: Check SSH Connection
+      command: echo "SSH connection successful!"
+      register: result
+
+    - name: Display result
+      debug:
+        msg: "{{ result.stdout }}"
