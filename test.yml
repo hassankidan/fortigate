@@ -1,0 +1,50 @@
+---
+- name: Add Facebook IP Blocks and Group
+  hosts: fortigates
+  gather_facts: no
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_transfer_method: piped    
+
+  tasks:
+
+    # Define Bearer Token for FortiGate REST API
+    - name: Define API Token
+      set_fact:
+        api_token: "Bearer {{ lookup('env', 'FORTINET_API_KEY') }}"
+
+    # Creating Individual IP addresses
+    - name: Create IP Address Facebook_{{ index }}"
+      uri:
+        url: "https://{{ inventory_hostname }}:981/api/v2/cmdb/firewall/address/Facebook_{{ index }}"
+        method: POST
+        body_format: json
+        body:
+          name: "Facebook_{{ index }}"
+          type: "ipmask"
+          subnet: "{{ item }}/32"
+        headers:
+          Authorization: "{{ api_token }}"
+        validate_certs: no
+      loop:
+        - "69.63.176.13"
+        # ... add other IPs here ...
+      loop_control:
+        index_var: index
+      register: ip_blocks
+
+    # ... Similarly, you can create IP Ranges and IP Blocks using the uri module ...
+
+    # Creating Address Group and adding IPs
+    - name: Create Address Group Facebook_group and Add IPs
+      uri:
+        url: "https://{{ inventory_hostname }}:981/api/v2/cmdb/firewall/addrgrp/Facebook_group"
+        method: POST
+        body_format: json
+        body:
+          name: "Facebook_group"
+          member: "{{ ip_blocks.results | map(attribute='json.result.object.name') | list }}"
+        headers:
+          Authorization: "{{ api_token }}"
+        validate_certs: no
